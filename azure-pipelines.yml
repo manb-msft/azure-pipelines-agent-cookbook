@@ -46,6 +46,7 @@ resources:
     - repository: templates
       type: git
       name: chef-pipelines-templates
+      ref: refs/heads/hotfix/conditional
 
 jobs:
   - template: common.yml@templates
