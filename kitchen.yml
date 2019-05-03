@@ -71,12 +71,9 @@ platforms:
 # 3. In the 'suites' section of this file, list your box name(s) under 'includes' for the corresponding platform
 # 4. Confirm your box shows up when running `vagrant box list` and `kitchen list` when in this cookbook directory
 
-  - name: osx1012
+  - name: macos-mojave
     driver:
-      box: osx1012
-      username: <%= ENV['BOX_USERNAME'] %>
-    provisioner:
-      require_chef_omnibus: 13.6.4
+      box: microsoft/macos-mojave
 
   - name: windows10
     driver_config:
@@ -131,16 +128,15 @@ suites:
             deployment_group_name: <%= ENV['VSTS_DEPLOYMENT_GROUP_NAME'] %>
             deployment_group_project: <%= ENV['VSTS_DEPLOYMENT_GROUP_PROJECT'] %>
 
-  - name: osx-basic
+  - name: macos-basic
     run_list:
-      - recipe[osx-basic::default]
+      - recipe[macos-basic::default]
     includes:
-      - osx1012
+      - macos-mojave
 
     attributes:
-        vsts_agent_test:
-            username: <%= ENV['BOX_USERNAME'] %>
-            vsts_url: <%= ENV['VSTS_URL'] %>
-            vsts_pool: <%= ENV['VSTS_POOL'] %>
-            vsts_token: <%= ENV['VSTS_TOKEN'] %>
-
+      vsts_agent_test:
+        username: <%= ENV['BOX_USERNAME'] %>
+        vsts_url: <%= ENV['VSTS_URL'] %>
+        vsts_pool: <%= ENV['VSTS_POOL'] %>
+        vsts_token: <%= ENV['VSTS_TOKEN'] %>
