@@ -1,7 +1,7 @@
 ---
 driver:
   name: vagrant
-  gui: true
+  box_check_update: true
   customize:
     cpus: 2
     memory: 1024
