@@ -7,10 +7,9 @@ driver:
     memory: 8092
 
 provisioner:
-  name: chef_zero
-  log_level: auto
-  client_rb:
-      add_formatter: doc
+  product_name: chef
+  product_version: 14
+  install_strategy: always
 
 platforms:
   - name: debian8
