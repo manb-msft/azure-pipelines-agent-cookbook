@@ -6,18 +6,23 @@ user 'builder' do
   password 'Pas$w0r_d'
 end
 
-grant_logon_as_service node['vsts_agent_test']['username']
+grant_logon_as_service node['dep_agent_store']['username']
 grant_logon_as_service 'builder'
 
 include_recipe 'seven_zip::default'
 
 #### End prepare system ####
 
+set VSTS_URL='https://dev.azure.com/tesco-colleague'
+set VSTS_POOL='HRAM Upgrade-INF'
+set VSTS_USER=deployer
+set VSTS_TOKEN='secret!'
+set VSTS_DEPLOYMENT_GROUP_NAME=INF
+set VSTS_DEPLOYMENT_GROUP_PROJECT='HRAM Upgrade'
+
 include_recipe 'vsts_agent::default'
 
-agent1_name = "win_#{node['hostname']}_01"
-agent2_name = "win_#{node['hostname']}_02"
-agent3_name = "win_#{node['hostname']}_deployment_03"
+dep_agent_name = "win_#{node['hostname']}_dep_agent"
 
 agents_dir = 'C:\\agents'
 
@@ -26,74 +31,27 @@ log 'Test notification' do
 end
 
 # cleanup
-vsts_agent agent1_name do
-  vsts_token node['vsts_agent_test']['vsts_token']
+
+vsts_agent dep_agent_name do
+  vsts_token node['dep_agent_store']['vsts_token']
   action :remove
 end
 
-vsts_agent agent2_name do
-  vsts_token node['vsts_agent_test']['vsts_token']
-  action :remove
-end
-
-vsts_agent agent3_name do
-  vsts_token node['vsts_agent_test']['vsts_token']
-  action :remove
-end
-
-# Agent1
-vsts_agent agent1_name do
-  install_dir "#{agents_dir}\\#{agent1_name}"
-  user node['vsts_agent_test']['username']
-  vsts_url node['vsts_agent_test']['vsts_url']
-  vsts_pool node['vsts_agent_test']['vsts_pool']
-  vsts_token node['vsts_agent_test']['vsts_token']
-  windowslogonaccount node['vsts_agent_test']['username']
-  windowslogonpassword node['vsts_agent_test']['username']
-  notifies :write, 'log[Test notification]', :immediately
-  action :install
-end
-
-vsts_agent agent1_name do
-  vsts_token node['vsts_agent_test']['vsts_token']
-  action :restart
-end
-
-vsts_agent agent1_name do
-  vsts_token node['vsts_agent_test']['vsts_token']
-  action :remove
-end
-
-# Agent2
-vsts_agent agent2_name do
-  install_dir "#{agents_dir}\\#{agent2_name}"
-  user 'builder'
-  vsts_url node['vsts_agent_test']['vsts_url']
-  vsts_pool node['vsts_agent_test']['vsts_pool']
-  vsts_token node['vsts_agent_test']['vsts_token']
-  windowslogonaccount 'NT AUTHORITY\\NetworkService'
-  action :install
-end
-
-vsts_agent agent2_name do
-  action :restart
-end
-
-# Agent3
-vsts_agent agent3_name do
+# Deployment Agent
+vsts_agent dep_agent_name do
   deploymentGroup true
-  deploymentGroupName node['vsts_agent_test']['deployment_group_name']
-  projectName node['vsts_agent_test']['deployment_group_project']
+  deploymentGroupName node['dep_agent_store']['deployment_group_name']
+  projectName node['dep_agent_store']['deployment_group_project']
   deploymentGroupTags 'web, db'
-  install_dir "#{agents_dir}\\#{agent2_name}"
+  install_dir "#{agents_dir}\\#{dep_agent_name}"
   user 'builder'
-  vsts_url node['vsts_agent_test']['vsts_url']
-  vsts_pool node['vsts_agent_test']['vsts_pool']
-  vsts_token node['vsts_agent_test']['vsts_token']
-  windowslogonaccount 'NT AUTHORITY\\NetworkService'
+  vsts_url node['dep_agent_store']['vsts_url']
+  vsts_pool node['dep_agent_store']['vsts_pool']
+  vsts_token node['dep_agent_store']['vsts_token']
+  windowslogonaccount 'NT AUTHORITY\\System'
   action :install
 end
 
-vsts_agent agent3_name do
+vsts_agent dep_agent_name do
   action :restart
 end
